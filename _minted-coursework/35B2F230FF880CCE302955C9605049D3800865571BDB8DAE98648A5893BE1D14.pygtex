@@ -1,0 +1,77 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+ch}{\PYGZsh{}!/usr/bin/env  python3}
+
+\PYG{k+kn}{from} \PYG{n+nn}{ldap3} \PYG{k+kn}{import} \PYG{n}{Server}\PYG{p}{,} \PYG{n}{Connection}\PYG{p}{,} \PYG{n}{ALL}
+\PYG{k+kn}{from} \PYG{n+nn}{subprocess} \PYG{k+kn}{import} \PYG{n}{run}
+\PYG{k+kn}{import} \PYG{n+nn}{sys}
+
+
+\PYG{k}{def} \PYG{n+nf}{main}\PYG{p}{():}
+    \PYG{n}{server} \PYG{o}{=} \PYG{n}{Server}\PYG{p}{(}
+                    \PYG{l+s+s1}{\PYGZsq{}network1.int.accelcomp.org\PYGZsq{}}\PYG{p}{,}
+                    \PYG{n}{get\PYGZus{}info}\PYG{o}{=}\PYG{n}{ALL}\PYG{p}{)}
+
+    \PYG{n}{conn} \PYG{o}{=} \PYG{n}{Connection}\PYG{p}{(}
+        \PYG{n}{server}\PYG{p}{,}
+        \PYG{n}{auto\PYGZus{}bind}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+
+    \PYG{n}{conn}\PYG{o}{.}\PYG{n}{search}\PYG{p}{(}
+        \PYG{n}{search\PYGZus{}base}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}ou=groups,dc=int,dc=accelcomp,dc=org\PYGZsq{}}\PYG{p}{,}
+        \PYG{n}{search\PYGZus{}filter}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}(|(gidNumber=5001)(gidNumber=5002)(gidNumber=5003))\PYGZsq{}}\PYG{p}{,}
+        \PYG{n}{paged\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{100}\PYG{p}{,}
+        \PYG{n}{attributes}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}*\PYGZsq{}}\PYG{p}{]}
+    \PYG{p}{)}
+
+    \PYG{n}{groups\PYGZus{}handler} \PYG{o}{=} \PYG{n}{conn}\PYG{o}{.}\PYG{n}{entries}
+
+    \PYG{n}{conn}\PYG{o}{.}\PYG{n}{search}\PYG{p}{(}
+        \PYG{n}{search\PYGZus{}base}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}ou=people,dc=int,dc=accelcomp,dc=org\PYGZsq{}}\PYG{p}{,}
+        \PYG{n}{search\PYGZus{}filter}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}(objectClass=inetOrgPerson)\PYGZsq{}}\PYG{p}{,}
+        \PYG{n}{paged\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{100}\PYG{p}{,}
+        \PYG{n}{attributes}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}*\PYGZsq{}}\PYG{p}{]}
+    \PYG{p}{)}
+
+    \PYG{n}{regular\PYGZus{}users} \PYG{o}{=} \PYG{n}{conn}\PYG{o}{.}\PYG{n}{entries}
+
+    \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{sys}\PYG{o}{.}\PYG{n}{argv}\PYG{p}{)} \PYG{o}{==} \PYG{l+m+mi}{2}\PYG{p}{:}
+
+        \PYG{c+c1}{\PYGZsh{} initialize cluster with a given name}
+        \PYG{c+c1}{\PYGZsh{} if it did not exist before}
+
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i add cluster }\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{sys}\PYG{o}{.}\PYG{n}{argv}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i add account regular\PYGZdq{}}\PYG{p}{,} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i add account power\PYGZdq{}}\PYG{p}{,} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i  add qos short\PYGZus{}term MaxWall=10:00\PYGZdq{}}\PYG{p}{,} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} just cleanup everything on each call}
+
+    \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i remove User where DefaultAccount=regular\PYGZdq{}}\PYG{p}{,} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} add accounts and give permissions (parse groups)}
+
+    \PYG{k}{for} \PYG{n}{uni\PYGZus{}member} \PYG{o+ow}{in} \PYG{n}{groups\PYGZus{}handler}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{.}\PYG{n}{memberUid}\PYG{p}{:}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i add user }\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{ DefaultAccount=regular Partition=uni\PYGZdq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{uni\PYGZus{}member}\PYG{p}{),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i modify user where name=}\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{ account=regular set qos+=short\PYGZus{}term defaultqos=short\PYGZus{}term\PYGZdq{}}
+            \PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{uni\PYGZus{}member}\PYG{p}{),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+
+    \PYG{k}{for} \PYG{n}{acc\PYGZus{}member} \PYG{o+ow}{in} \PYG{n}{groups\PYGZus{}handler}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{]}\PYG{o}{.}\PYG{n}{memberUid}\PYG{p}{:}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i add user }\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{ DefaultAccount=regular\PYGZdq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{acc\PYGZus{}member}\PYG{p}{),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i modify user where name=}\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{ account=regular set qos+=short\PYGZus{}term defaultqos=short\PYGZus{}term\PYGZdq{}}
+            \PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{acc\PYGZus{}member}\PYG{p}{),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} parse all ldap users}
+
+    \PYG{k}{for} \PYG{n}{user} \PYG{o+ow}{in} \PYG{n}{regular\PYGZus{}users}\PYG{p}{:}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i add user }\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{ DefaultAccount=regular Partition=debug\PYGZdq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{user}\PYG{o}{.}\PYG{n}{uid}\PYG{p}{),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i modify user where name=}\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{ account=regular set qos+=short\PYGZus{}term defaultqos=short\PYGZus{}term\PYGZdq{}}
+            \PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{user}\PYG{o}{.}\PYG{n}{uid}\PYG{p}{),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+
+    \PYG{k}{for} \PYG{n}{power\PYGZus{}member} \PYG{o+ow}{in} \PYG{n}{groups\PYGZus{}handler}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{.}\PYG{n}{memberUid}\PYG{p}{:}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i add user }\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{ DefaultAccount=power\PYGZdq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{power\PYGZus{}member}\PYG{p}{),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{run}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}sacctmgr \PYGZhy{}i modify user where name=}\PYG{l+s+si}{\PYGZob{}\PYGZcb{}}\PYG{l+s+s2}{ account=power set defaultqos=normal\PYGZdq{}}
+            \PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{power\PYGZus{}member}\PYG{p}{),} \PYG{n}{shell}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZdq{}}\PYG{p}{:}
+    \PYG{n}{main}\PYG{p}{()}
+\end{Verbatim}

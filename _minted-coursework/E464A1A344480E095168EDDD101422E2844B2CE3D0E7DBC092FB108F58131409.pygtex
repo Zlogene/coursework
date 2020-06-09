@@ -1,0 +1,48 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+SlurmctldHost=control1
+DisableRootJobs=YES
+MpiDefault=pmix\PYGZus{}v3
+PluginDir=/usr/local/slurm/lib/slurm
+PlugStackConfig=/etc/slurm/plugstack.conf
+ProctrackType=proctrack/linuxproc
+ReturnToService=1
+SlurmctldPidFile=/var/run/slurmctld.pid
+SlurmctldPort=6817
+SlurmdPidFile=/var/run/slurmd.pid
+SlurmdPort=6818
+SlurmdSpoolDir=/home/slurm/slurmd
+SlurmUser=slurm
+StateSaveLocation=/home/slurm
+SwitchType=switch/none
+TaskPlugin=task/affinity
+TaskPluginParam=Sched
+InactiveLimit=0
+KillWait=30
+MinJobAge=300
+SlurmctldTimeout=120
+SlurmdTimeout=300
+Waittime=0
+FastSchedule=1
+SchedulerType=sched/builtin
+SelectType=select/cons\PYGZus{}res
+SelectTypeParameters=CR\PYGZus{}Core
+AccountingStorageEnforce=limits
+AccountingStoragePort=7031
+AccountingStorageType=accounting\PYGZus{}storage/slurmdbd
+AccountingStoreJobComment=YES
+ClusterName=cluster
+JobCompType=jobcomp/none
+JobContainerType=job\PYGZus{}container/none
+JobAcctGatherFrequency=30
+JobAcctGatherType=jobacct\PYGZus{}gather/none
+SlurmctldDebug=debug5
+SlurmctldLogFile=/tmp/slurmctld.log
+SlurmdDebug=debug5
+SlurmdLogFile=/tmp/slurmd.log
+NodeName=dnode[01,02,03,04] RealMemory=64000 Sockets=2 CoresPerSocket=10 ThreadsPerCore=1 State=UNKNOWN
+NodeName=dnode[05,06,07,08] RealMemory=128000 Sockets=2 CoresPerSocket=10 ThreadsPerCore=1 State=UNKNOWN
+NodeName=dnode[09,10,11,12,13,14] RealMemory=16000 Sockets=2 CoresPerSocket=6 ThreadsPerCore=1 State=UNKNOWN
+NodeName=cnode[1,2,3,4,5,6,7] RealMemory=64000 Sockets=2 CoresPerSocket=8 ThreadsPerCore=1 State=UNKNOWN
+PartitionName=all Nodes=cnode[1,2,3,4,5,6,7],dnode[01,02,03,04,05,06,07,08,09,10,11,12,13,14] MaxTime=INFINITE State=UP
+PartitionName=uni Nodes=cnode[1,2,3,4,5,6,7] MaxTime=INFINITE State=UP
+\end{Verbatim}

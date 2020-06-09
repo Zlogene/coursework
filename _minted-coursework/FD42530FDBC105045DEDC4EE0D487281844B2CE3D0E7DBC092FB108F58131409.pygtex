@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+ARCH         = amd64
+TOPdir       = \PYGZdl{}(HOME)/hpl
+MPdir         = /usr/mpi/gcc/openmpi\PYGZhy{}4.0.3
+MPinc        = \PYGZhy{}I \PYGZdl{}(MPdir)/include
+MPlib        = \PYGZdl{}(MPdir)/lib/libmpi.so
+LAdir        = /usr/lib/x86\PYGZus{}64\PYGZhy{}linux\PYGZhy{}gnu/blas/
+LAlib        = \PYGZdl{}(LAdir)/libblas.a
+\end{Verbatim}

@@ -1,0 +1,38 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+HPLinpack benchmark input file
+Innovative Computing Laboratory, University of Tennessee
+HPL.out      output file name (if any)
+6            device out (6=stdout,7=stderr,file)
+1            \PYGZsh{} of problems sizes (N)
+115584         Ns
+1            \PYGZsh{} of NBs
+192           NBs
+0            PMAP process mapping (0=Row\PYGZhy{},1=Column\PYGZhy{}major)
+1            \PYGZsh{} of process grids (P x Q)
+4            Ps
+4            Qs
+16.0         threshold
+1            \PYGZsh{} of panel fact
+2            PFACTs (0=left, 1=Crout, 2=Right)
+1            \PYGZsh{} of recursive stopping criterium
+4            NBMINs (\PYGZgt{}= 1)
+1            \PYGZsh{} of panels in recursion
+2            NDIVs
+1            \PYGZsh{} of recursive panel fact.
+1            RFACTs (0=left, 1=Crout, 2=Right)
+1            \PYGZsh{} of broadcast
+1            BCASTs (0=1rg,1=1rM,2=2rg,3=2rM,4=Lng,5=LnM)
+1            \PYGZsh{} of lookahead depth
+1            DEPTHs (\PYGZgt{}=0)
+2            SWAP (0=bin\PYGZhy{}exch,1=long,2=mix)
+64           swapping threshold
+0            L1 in (0=transposed,1=no\PYGZhy{}transposed) form
+0            U  in (0=transposed,1=no\PYGZhy{}transposed) form
+1            Equilibration (0=no,1=yes)
+8            memory alignment in double (\PYGZgt{} 0)
+\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{} This line (no. 32) is ignored (it serves as a separator). \PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}
+0                               Number of additional problem sizes for PTRANS
+1200 10000 30000                values of N
+0                               number of additional blocking sizes for PTRANS
+40 9 8 13 13 20 16 32 64        values of NB
+\end{Verbatim}

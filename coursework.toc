@@ -1,0 +1,24 @@
+\babel@toc {russian}{}
+\babel@toc {russian}{}
+\contentsline {section}{Введение}{2}%
+\contentsline {section}{\numberline {1}Теоретическая информация}{4}%
+\contentsline {subsection}{\numberline {1.1}Описание архитектуры кластера}{4}%
+\contentsline {subsection}{\numberline {1.2}Менеджер конфигурации saltstack}{6}%
+\contentsline {subsubsection}{\numberline {1.2.1}Взаимодействие компонентов salt}{6}%
+\contentsline {subsubsection}{\numberline {1.2.2}Файлы состояний}{6}%
+\contentsline {section}{\numberline {2}Практическая реализация}{7}%
+\contentsline {subsection}{\numberline {2.1}Сборка пакетов из исходного кода}{7}%
+\contentsline {subsection}{\numberline {2.2}Подготовка конфигурации slurm}{7}%
+\contentsline {subsection}{\numberline {2.3}Подготовка конфигурации saltstack}{8}%
+\contentsline {subsection}{\numberline {2.4}Развёртывание кластера}{11}%
+\contentsline {subsubsection}{\numberline {2.4.1}Синхронизация пользователей ldap в slurm accounting}{12}%
+\contentsline {section}{\numberline {3}Тестирование производительности}{14}%
+\contentsline {subsection}{\numberline {3.1}Подготовка к тестированию}{14}%
+\contentsline {subsection}{\numberline {3.2}Проведение тестирования}{14}%
+\contentsline {section}{Заключение}{17}%
+\contentsline {section}{Список литературы}{18}%
+\contentsline {section}{Приложение А --- Скрипт сборки пакетов}{19}%
+\contentsline {section}{Приложение Б --- Файл конфигурации slurm}{24}%
+\contentsline {section}{Приложение В --- Файл конфигурации slurmdbd}{25}%
+\contentsline {section}{Приложение Г --- Скрипт синхронизации с ldap}{26}%
+\contentsline {section}{Приложение Д --- Файл конфигурации HPL.dat}{28}%

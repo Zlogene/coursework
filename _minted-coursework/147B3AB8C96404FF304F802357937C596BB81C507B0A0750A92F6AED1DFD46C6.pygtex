@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{p+pIndicator}{\PYGZob{}}\PYG{err}{\PYGZpc{}} \PYG{n+nv}{set hostname = salt.grains.get(\PYGZsq{}host\PYGZsq{}) \PYGZpc{}}\PYG{p+pIndicator}{\PYGZcb{}}
+
+\PYG{n+nt}{distribute krb5.keytab files}\PYG{p}{:}
+    \PYG{n+nt}{file.managed}\PYG{p}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{name}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{/etc/krb5.keytab}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{source}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{salt://keytabs/\PYGZob{}\PYGZob{} hostname \PYGZcb{}\PYGZcb{}.keytab}
+\end{Verbatim}

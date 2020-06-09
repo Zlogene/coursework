@@ -1,0 +1,23 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{base}\PYG{p}{:}
+    \PYG{l+s}{\PYGZsq{}*\PYGZsq{}}\PYG{p+pIndicator}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.setup}
+    \PYG{l+s}{\PYGZsq{}cnode(01|02|03|04|05|06|07).int.accelcomp.org\PYGZsq{}}\PYG{p+pIndicator}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{match}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{pcre}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.cuda8}
+    \PYG{l+s}{\PYGZsq{}control1.int.accelcomp.org\PYGZsq{}}\PYG{p+pIndicator}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{match}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{pcre}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.control\PYGZhy{}node}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.cuda10}
+    \PYG{+Error}{   }\PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.mellanox\PYGZhy{}needed}
+    \PYG{l+s}{\PYGZsq{}dnode(01|02|03|04|05|06|07|08).int.accelcomp\PYGZsq{}}\PYG{p+pIndicator}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{match}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{pcre}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.cuda10}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.mellanox\PYGZhy{}needed}
+    \PYG{l+s}{\PYGZsq{}dnode(09|10|11|12|13|14).int.accelcomp\PYGZsq{}}\PYG{p+pIndicator}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{match}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{pcre}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.mellanox\PYGZhy{}needed}
+    \PYG{l+s}{\PYGZsq{}not}\PYG{n+nv}{ }\PYG{l+s}{control1.int.accelcomp.org\PYGZsq{}}\PYG{p+pIndicator}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{match}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{compound}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{sls.slurmd}
+\end{Verbatim}

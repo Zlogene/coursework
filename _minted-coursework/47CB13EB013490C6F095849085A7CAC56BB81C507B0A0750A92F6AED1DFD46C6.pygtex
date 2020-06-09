@@ -1,0 +1,10 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{slurm accounting grants}\PYG{p}{:}
+    \PYG{n+nt}{mysql\PYGZus{}grants.present}\PYG{p}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{grant}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{all privileges}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{database}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{slurm\PYGZus{}acct\PYGZus{}db.*}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{user}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{slurm}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{connection\PYGZus{}user}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{root}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{connection\PYGZus{}pass}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{RanDoMPassWord}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{connection\PYGZus{}charset}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{utf8}
+\end{Verbatim}

@@ -1,0 +1,12 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{slurm\PYGZus{}user}\PYG{p}{:}
+    \PYG{n+nt}{user.present}\PYG{p}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{name}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{slurm}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{fullname}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{Slurm}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{shell}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{/bin/false}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{home}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{/home/slurm}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{uid}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{64030}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{gid\PYGZus{}from\PYGZus{}name}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{True}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{require}\PYG{p}{:}
+             \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{group}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{slurm}
+\end{Verbatim}

@@ -1,0 +1,283 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+ch}{\PYGZsh{}!/usr/bin/env bash}
+
+\PYG{c+c1}{\PYGZsh{} The script accepts a directory}
+\PYG{c+c1}{\PYGZsh{} with needed tarballs as an argument}
+\PYG{c+c1}{\PYGZsh{} so make sure that you put everything you need there}
+\PYG{c+c1}{\PYGZsh{} before running the script.}
+\PYG{c+c1}{\PYGZsh{} Do not also forget to track down}
+\PYG{c+c1}{\PYGZsh{} the \PYGZdl{}mpi3\PYGZus{}prefix and \PYGZdl{}mpi4\PYGZus{}prefix on OpenMPI version changes}
+
+\PYG{k}{if} \PYG{o}{[[} \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{UID}\PYG{l+s+si}{\PYGZcb{}} \PYGZhy{}ne \PYG{l+m}{0} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+    \PYG{n+nb}{echo} \PYG{l+s+s2}{\PYGZdq{}You must be logged in as root to run this script!\PYGZdq{}}
+    \PYG{n+nb}{exit} \PYG{l+m}{1}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} temporary directory for deb files}
+
+mkdir \PYGZhy{}p /tmp/deb\PYGZus{}packages
+
+\PYG{c+c1}{\PYGZsh{} shut up perl nagging}
+\PYG{n+nb}{export} \PYG{n+nv}{LC\PYGZus{}ALL}\PYG{o}{=}C
+\PYG{n+nb}{export} \PYG{n+nv}{LANGUAGE}\PYG{o}{=}C
+
+\PYG{c+c1}{\PYGZsh{} shut up slurm mysql nagging}
+
+\PYG{n+nb}{export} \PYG{n+nv}{HAVEMYSQLCONFIG}\PYG{o}{=}/usr/bin/mysql\PYGZus{}config
+\PYG{n+nb}{export} \PYG{n+nv}{ac\PYGZus{}have\PYGZus{}mysql}\PYG{o}{=}yes
+
+apt\PYGZhy{}get install \PYGZhy{}y  libkrb5\PYGZhy{}dev bison \PYG{l+s+se}{\PYGZbs{}}
+  libevent\PYGZhy{}dev munge libmunge\PYGZhy{}dev flex libssl\PYGZhy{}dev uuid\PYGZhy{}dev \PYG{l+s+se}{\PYGZbs{}}
+        checkinstall m4 libnuma\PYGZhy{}dev gcc\PYGZhy{}multilib gfortran \PYGZgt{} /dev/null \PYG{l+m}{2}\PYGZgt{}\PYG{p}{\PYGZam{}}\PYG{l+m}{1}
+
+\PYG{n+nv}{tempdir}\PYG{o}{=}\PYG{k}{\PYGZdl{}(}mktemp \PYGZhy{}d /tmp/slurm\PYGZhy{}build\PYGZhy{}XXX \PYGZhy{}\PYGZhy{}suffix\PYG{o}{=}\PYGZhy{}\PYG{k}{\PYGZdl{}(}date +\PYG{l+s+s2}{\PYGZdq{}\PYGZpc{}m\PYGZhy{}\PYGZpc{}d\PYGZhy{}\PYGZpc{}y\PYGZdq{}}\PYG{k}{))}
+
+\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}/usr/local\PYGZdq{}}
+\PYG{n+nv}{mpi4\PYGZus{}prefix}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}/usr/mpi/gcc/openmpi\PYGZhy{}4.0.1\PYGZdq{}}
+\PYG{n+nv}{mpi3\PYGZus{}prefix}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}/usr/mpi/gcc/openmpi\PYGZhy{}3.1.3\PYGZdq{}}
+\PYG{n+nv}{mpi1\PYGZus{}prefix}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}/usr/mpi/gcc/openmpi\PYGZhy{}1.6.5\PYGZhy{}32\PYGZdq{}}
+\PYG{n+nv}{toolchain\PYGZus{}prefix}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}/usr/local/autotools\PYGZdq{}}
+
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}z \PYG{l+s+s2}{\PYGZdq{}}\PYG{n+nv}{\PYGZdl{}1}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+    \PYG{n+nb}{echo} \PYG{l+s+s2}{\PYGZdq{}Ooops... you seem to forget to point a dir!\PYGZdq{}}
+    \PYG{n+nb}{exit} \PYG{l+m}{1}
+\PYG{k}{fi}
+
+run\PYGZus{}binary\PYGZus{}build\PYG{o}{()} \PYG{o}{\PYGZob{}}
+    make \PYGZhy{}j\PYG{k}{\PYGZdl{}(}nproc\PYG{k}{)}
+    checkinstall \PYGZhy{}y \PYGZhy{}\PYGZhy{}pakdir\PYG{o}{=}/tmp/deb\PYGZus{}packages \PYGZhy{}\PYGZhy{}install\PYG{o}{=}no \PYG{l+s+se}{\PYGZbs{}}
+    \PYGZhy{}\PYGZhy{}pkgname\PYG{o}{=}\PYG{n+nv}{\PYGZdl{}1} \PYGZhy{}\PYGZhy{}pkgversion\PYG{o}{=}\PYG{n+nv}{\PYGZdl{}2}
+\PYG{o}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} The run\PYGZus{}binary\PYGZus{}build() function}
+\PYG{c+c1}{\PYGZsh{} accepts two optional arguments}
+\PYG{c+c1}{\PYGZsh{} that can be used when we need}
+\PYG{c+c1}{\PYGZsh{} few versions of the same package}
+\PYG{c+c1}{\PYGZsh{} installed at the same time}
+\PYG{c+c1}{\PYGZsh{} or neither versior nor name of}
+\PYG{c+c1}{\PYGZsh{} a package is not clear for checkinstall}
+\PYG{c+c1}{\PYGZsh{} look at either singularity or hwloc or openmpi examples}
+
+run\PYGZus{}source\PYGZus{}build\PYG{o}{()} \PYG{o}{\PYGZob{}}
+        make \PYGZhy{}j\PYG{k}{\PYGZdl{}(}nproc\PYG{k}{)}
+        make install
+
+\PYG{o}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} The run\PYGZus{}source\PYGZus{}build() function is only needed for}
+\PYG{c+c1}{\PYGZsh{} packages that we do not want/need to convert to}
+\PYG{c+c1}{\PYGZsh{} the binary packages but need them to build}
+\PYG{c+c1}{\PYGZsh{} binaries (libtool/autoconf/automake/m4 and so on)}
+
+\PYG{n+nb}{cd} \PYG{n+nv}{\PYGZdl{}1}
+
+\PYG{k}{for} item in *tar*\PYG{p}{;} \PYG{k}{do}
+    tar xf \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{item}\PYG{l+s+si}{\PYGZcb{}} \PYGZhy{}C \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{tempdir}\PYG{l+s+si}{\PYGZcb{}}
+\PYG{k}{done}
+
+\PYG{c+c1}{\PYGZsh{} install cuda repositories}
+dpkg \PYGZhy{}i \PYGZhy{}\PYGZhy{}force\PYGZhy{}overwrite cuda\PYGZhy{}repo\PYGZhy{}ubuntu1604\PYGZhy{}8\PYGZhy{}0\PYGZhy{}local\PYGZhy{}ga2\PYGZus{}8.0.61\PYGZhy{}1\PYGZus{}amd64.deb
+dpkg \PYGZhy{}i \PYGZhy{}\PYGZhy{}force\PYGZhy{}overwrite cuda\PYGZhy{}repo\PYGZhy{}ubuntu1804\PYGZhy{}10\PYGZhy{}2\PYGZhy{}local\PYGZhy{}10.2.89\PYGZhy{}440.33.01\PYGZus{}1.0\PYGZhy{}1\PYGZus{}amd64.deb
+
+apt\PYGZhy{}key add /var/cuda\PYGZhy{}repo\PYGZhy{}10\PYGZhy{}2\PYGZhy{}local\PYGZhy{}10.2.89\PYGZhy{}440.33.01/7fa2af80.pub
+apt\PYGZhy{}key add /var/cuda\PYGZhy{}repo\PYGZhy{}8\PYGZhy{}0\PYGZhy{}local\PYGZhy{}ga2/7fa2af80.pub
+
+apt\PYGZhy{}get update
+
+\PYG{n+nb}{cd} \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{tempdir}\PYG{l+s+si}{\PYGZcb{}}
+
+\PYG{n+nv}{files}\PYG{o}{=(} hwloc\PYGZhy{}1*
+        hwloc\PYGZhy{}2*
+        libevent*
+        m4*
+        autoconf*
+        automake*
+        libtool*
+        pmix*
+        slurm*
+        auks*
+        openmpi\PYGZhy{}1*
+        openmpi\PYGZhy{}3*
+        openmpi\PYGZhy{}4*
+        go*
+        singularity* \PYG{o}{)}
+
+\PYG{n+nb}{echo} \PYG{l+s+s2}{\PYGZdq{}Just make sure that you have right packages to install\PYGZdq{}}
+
+\PYG{n+nb}{echo} \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[@]}\PYG{l+s+si}{\PYGZcb{}}
+
+\PYG{n+nb}{read} \PYGZhy{}n \PYG{l+m}{1} \PYGZhy{}s \PYGZhy{}r \PYGZhy{}p \PYG{l+s+s2}{\PYGZdq{}And then press any key to continue \PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{} copy go properly}
+mv \PYGZhy{}f \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{tempdir}\PYG{l+s+si}{\PYGZcb{}}/go \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}/
+
+\PYG{c+c1}{\PYGZsh{} hwloc\PYGZhy{}1}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[0]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[0]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+       ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/hwloc\PYGZhy{}1\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}hwloc1\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} hwloc\PYGZhy{}2}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e  \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[1]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[1]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/hwloc\PYGZhy{}2\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}hwloc2\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} libevent}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[2]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}  \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[2]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+       ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/libevent\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}libevent\PYGZdq{}} \PYG{l+s+s2}{\PYGZdq{}2.1.10\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}}  \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{n+nb}{export} \PYG{n+nv}{PATH}\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{PATH}\PYG{l+s+si}{\PYGZcb{}}:/usr/local/autotools/bin
+
+\PYG{c+c1}{\PYGZsh{} m4}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[3]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}  \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[3]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+       ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{toolchain\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}} \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}source\PYGZus{}build \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} autoconf}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[4]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}  \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[4]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+       ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{toolchain\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}} \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}source\PYGZus{}build \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} automake}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[5]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}  \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[5]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+       ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{toolchain\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}} \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}source\PYGZus{}build \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} libtool}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[6]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}  \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[6]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+       ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{toolchain\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}} \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}source\PYGZus{}build \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} pmix}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[7]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[7]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        ./autogen.pl
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/pmix\PYGZdq{}} \PYGZhy{}\PYGZhy{}with\PYGZhy{}platform\PYG{o}{=}optimized \PYGZhy{}\PYGZhy{}with\PYGZhy{}libevent\PYG{o}{=}/usr/local/libevent \PYGZhy{}\PYGZhy{}disable\PYGZhy{}pmi\PYGZhy{}backward\PYGZhy{}compatibility \PYG{l+s+se}{\PYGZbs{}}
+         \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}pmix\PYGZdq{}} \PYG{l+s+s2}{\PYGZdq{}3.1.4\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} slurm}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[8]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[8]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/slurm\PYGZdq{}} \PYGZhy{}\PYGZhy{}sysconfdir\PYG{o}{=}/etc/slurm \PYGZhy{}\PYGZhy{}without\PYGZhy{}ucx \PYGZhy{}\PYGZhy{}without\PYGZhy{}freeipmi \PYGZhy{}\PYGZhy{}with\PYGZhy{}pmix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/pmix\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}mysql\PYGZus{}config\PYG{o}{=}/usr/bin \PYG{l+s+se}{\PYGZbs{}}
+         \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} auks}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[9]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[9]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        \PYG{c+c1}{\PYGZsh{} temporary hack, makefiles may be changed in the future}
+        sed \PYGZhy{}i \PYG{l+s+s1}{\PYGZsq{}s/\PYGZhy{}lkrb5 \PYGZhy{}pthread/\PYGZhy{}lkrb5 \PYGZhy{}lpthread/g\PYGZsq{}} src/api/auks/Makefile.am
+        sed \PYGZhy{}i \PYG{l+s+s1}{\PYGZsq{}s/\PYGZhy{}lkrb5 \PYGZhy{}pthread/\PYGZhy{}lkrb5 \PYGZhy{}lpthread/g\PYGZsq{}} src/api/auks/Makefile.in
+        sed \PYGZhy{}i \PYG{l+s+s1}{\PYGZsq{}s/MANS = \PYGZdl{}(man1\PYGZus{}MANS) \PYGZdl{}(man5\PYGZus{}MANS) \PYGZdl{}(man8\PYGZus{}MANS)/MANS = \PYGZdl{}(man1\PYGZus{}MANS) \PYGZdl{}(man5\PYGZus{}MANS)/g\PYGZsq{}} doc/man/Makefile.in
+        sed \PYGZhy{}i \PYG{l+s+s1}{\PYGZsq{}s/install\PYGZhy{}man: install\PYGZhy{}man1 install\PYGZhy{}man5 install\PYGZhy{}man8/install\PYGZhy{}man: install\PYGZhy{}man1 install\PYGZhy{}man5/g\PYGZsq{}} doc/man/Makefile.in
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/auks\PYGZdq{}} \PYGZhy{}\PYGZhy{}sysconfdir\PYG{o}{=}/etc/auks \PYGZhy{}\PYGZhy{}with\PYGZhy{}slurm\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/slurm\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+
+\PYG{c+c1}{\PYGZsh{} install cuda}
+apt\PYGZhy{}get \PYGZhy{}\PYGZhy{}reinstall install \PYGZhy{}y cuda\PYGZhy{}8\PYGZhy{}0
+apt\PYGZhy{}get \PYGZhy{}\PYGZhy{}reinstall install \PYGZhy{}y cuda
+
+
+\PYG{c+c1}{\PYGZsh{} openmpi\PYGZhy{}1}
+\PYG{k}{if} \PYG{o}{[[} ! \PYGZhy{}d \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{file}\PYG{p}{[10]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[10]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{mpi1\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}disable\PYGZhy{}vt \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}build\PYG{o}{=}i686\PYGZhy{}pc\PYGZhy{}linux\PYGZhy{}gnu \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}slurm\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/slurm\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}openmpi1\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} openmpi\PYGZhy{}3 and openmpi\PYGZhy{}4 with cuda}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[11]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[11]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{mpi3\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}slurm\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/slurm\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}libevent\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/libevent\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}hwloc\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/hwloc\PYGZhy{}1\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}pmix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/pmix\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}cuda\PYG{o}{=}/usr/local/cuda \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}without\PYGZhy{}ucx \PYG{l+s+se}{\PYGZbs{}}
+         \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}openmpi3\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{k}{if}  \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[12]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[12]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{mpi4\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}slurm\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}libevent\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/libevent\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}hwloc\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/hwloc\PYGZhy{}2\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}pmix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/pmix\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}cuda\PYG{o}{=}/usr/local/cuda \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}without\PYGZhy{}ucx \PYG{l+s+se}{\PYGZbs{}}
+        \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}openmpi4\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{c+c1}{\PYGZsh{} openmpi\PYGZhy{}3 and openmpi\PYGZhy{}4 without cuda}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[11]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[11]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{mpi3\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}without\PYGZus{}cuda\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}slurm\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/slurm\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}libevent\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/libevent\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}hwloc\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/hwloc\PYGZhy{}1\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}pmix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/pmix\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}without\PYGZhy{}cuda \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}without\PYGZhy{}ucx \PYG{l+s+se}{\PYGZbs{}}
+         \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}openmpi3\PYGZus{}without\PYGZus{}cuda\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{k}{if}  \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[12]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+        \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[12]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        ./configure \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{mpi4\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}without\PYGZus{}cuda\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}slurm\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/slurm\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}libevent\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/libevent\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}hwloc\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/hwloc\PYGZhy{}2\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}with\PYGZhy{}pmix\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{/pmix\PYGZdq{}} \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}without\PYGZhy{}cuda \PYG{l+s+se}{\PYGZbs{}}
+        \PYGZhy{}\PYGZhy{}without\PYGZhy{}ucx \PYG{l+s+se}{\PYGZbs{}}
+        \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}openmpi4\PYGZus{}without\PYGZus{}cuda\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+\PYG{n+nb}{export} \PYG{n+nv}{PATH}\PYG{o}{=}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}/go/bin:\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{PATH}\PYG{l+s+si}{\PYGZcb{}}:\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{GOPATH}\PYG{l+s+si}{\PYGZcb{}}/bin
+
+\PYG{c+c1}{\PYGZsh{} singularity}
+\PYG{k}{if} \PYG{o}{[[} \PYGZhy{}e \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[14]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{]]}\PYG{p}{;} \PYG{k}{then}
+       \PYG{n+nb}{pushd} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{files}\PYG{p}{[14]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+       ./mconfig \PYGZhy{}\PYGZhy{}prefix\PYG{o}{=}/usr/local/singularity \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{l+s+se}{\PYGZbs{}}
+       \PYG{n+nb}{cd} ./builddir \PYG{o}{\PYGZam{}\PYGZam{}} run\PYGZus{}binary\PYGZus{}build \PYG{l+s+s2}{\PYGZdq{}singularity\PYGZdq{}} \PYG{l+s+s2}{\PYGZdq{}3.5.3\PYGZdq{}} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nb}{popd}
+\PYG{k}{fi}
+
+chmod \PYG{l+m}{4755} \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}/singularity/libexec/singularity/bin/starter\PYGZhy{}suid
+
+
+mkdir \PYGZhy{}p /tmp/clusterbuild
+
+mv \PYGZhy{}f \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{basic\PYGZus{}prefix}\PYG{l+s+si}{\PYGZcb{}}/* /tmp/clusterbuild \PYGZgt{} /dev/null \PYG{l+m}{2}\PYGZgt{}\PYG{p}{\PYGZam{}}\PYG{l+m}{1}
+\PYG{c+c1}{\PYGZsh{} we install cuda per node using saltstack}
+rm \PYGZhy{}fr /tmp/clusterbuild/cuda*
+rm \PYGZhy{}fr /var/cuda*
+rm \PYGZhy{}fr /tmp/clusterbuild/autotools
+rm \PYGZhy{}fr  /etc/apt/sources.list.d/*cuda*
+
+\PYG{n+nb}{echo} \PYG{l+s+s2}{\PYGZdq{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZdq{}}
+\PYG{n+nb}{echo} \PYG{l+s+s2}{\PYGZdq{}compilation finished!\PYGZdq{}}
+\PYG{n+nb}{echo} \PYG{l+s+s2}{\PYGZdq{}BINARY packages here: (add them to the repository)\PYGZdq{}}
+\PYG{n+nb}{echo} \PYG{l+s+s2}{\PYGZdq{}/tmp/deb\PYGZus{}packages\PYGZdq{}}
+\PYG{n+nb}{echo} \PYG{l+s+s2}{\PYGZdq{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZdq{}}
+
+rm \PYGZhy{}fr \PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nv}{tempdir}\PYG{l+s+si}{\PYGZcb{}}
+
+apt\PYGZhy{}get remove \PYGZhy{}y \PYGZhy{}\PYGZhy{}purge cuda* \PYGZgt{} /dev/null \PYG{l+m}{2}\PYGZgt{}\PYG{p}{\PYGZam{}}\PYG{l+m}{1}
+\end{Verbatim}

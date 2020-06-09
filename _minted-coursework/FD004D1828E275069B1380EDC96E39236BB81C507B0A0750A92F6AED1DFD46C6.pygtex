@@ -1,0 +1,34 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nt}{mellanox specified packages}\PYG{p}{:}
+    \PYG{n+nt}{pkg.installed}\PYG{p}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{pkgs}\PYG{p}{:}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{m4}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{swig}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{autoconf}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{quilt}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{libltdl\PYGZhy{}dev}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{gfortran}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{autotools\PYGZhy{}dev}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{libgfortran3}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{flex}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{automake}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{graphviz}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{tk}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{bison}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{tcl}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{chrpath}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{debhelper}
+           \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{dpatch}
+
+\PYG{n+nt}{unpack mlx\PYGZus{}ofed}\PYG{p}{:}
+    \PYG{n+nt}{archive.extracted}\PYG{p}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{name}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{/usr/local}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{source}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{/clusterhome/install/saltcluster/MLNX\PYGZus{}OFED\PYGZus{}LINUX\PYGZhy{}4.6\PYGZhy{}1.0.1.1\PYGZhy{}ubuntu16.04\PYGZhy{}x86\PYGZus{}64.tgz}
+
+\PYG{n+nt}{install mlx\PYGZus{}ofed}\PYG{p}{:}
+    \PYG{n+nt}{cmd.run}\PYG{p}{:}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{name}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{/usr/bin/perl /usr/local/MLNX\PYGZus{}OFED\PYGZus{}LINUX\PYGZhy{}4.6\PYGZhy{}1.0.1.1\PYGZhy{}ubuntu16.04\PYGZhy{}x86\PYGZus{}64/mlnxofedinstall \PYGZhy{}\PYGZhy{}force}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{runas}\PYG{p}{:} \PYG{l+lScalar+lScalarPlain}{root}
+        \PYG{p+pIndicator}{\PYGZhy{}} \PYG{n+nt}{unless}\PYG{p}{:}
+            \PYG{p+pIndicator}{\PYGZhy{}} \PYG{l+lScalar+lScalarPlain}{ls /usr/sbin/iblinkinfo}
+\end{Verbatim}
